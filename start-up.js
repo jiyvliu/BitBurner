@@ -1,9 +1,6 @@
 /** @param {NS} ns **/
 export async function main(ns) {
 
-  ns.disableLog('ALL')
-  // push test
-
   // hacking script
   const script = "early-hack-template.script";
   const ram_usage = ns.getScriptRam(script);
@@ -66,14 +63,8 @@ export async function main(ns) {
       children.splice(children.indexOf(parent), 1)
     }
 
-    // servers that have ram + need 5 ports
-
-    if (ns.getServerNumPortsRequired(serv) == 5 && ns.getServerMaxRam(serv) > 0) {
-      ns.print(serv)
-    }
-
-
     hackServer(serv)
+    
     if (children.length > 0) {
       for (let child of children) {
         hackAll(child, serv)
@@ -105,7 +96,7 @@ export async function main(ns) {
 
   // Wait until we acquire the "BruteSSH.exe" program
   while (!ns.fileExists("BruteSSH.exe")) {
-    await sleep(60000);
+    await ns.sleep(60000);
   }
 
   for (let serv of servers1Port) {
@@ -115,7 +106,7 @@ export async function main(ns) {
   }
 
   while (!ns.fileExists("FTPCrack.exe")) {
-    await sleep(60000);
+    await ns.sleep(60000);
   }
 
   for (let serv of servers2Port) {
@@ -125,7 +116,7 @@ export async function main(ns) {
   }
 
   while (!ns.fileExists("DeepscanV1.exe")) {
-    await sleep(60000);
+    await ns.sleep(60000);
   }
 
   for (let serv of servers1Deep) {
@@ -135,7 +126,7 @@ export async function main(ns) {
   }
 
   while (!ns.fileExists("relaySMTP.exe")) {
-    await sleep(60000);
+    await ns.sleep(60000);
   }
 
   for (let serv of servers3Port) {
@@ -145,7 +136,7 @@ export async function main(ns) {
   }
 
   while (!ns.fileExists("DeepscanV2.exe")) {
-    await sleep(60000)
+    await ns.sleep(60000)
   }
 
   for (let serv of servers2Deep) {
@@ -155,7 +146,7 @@ export async function main(ns) {
   }
 
   while (!ns.fileExists("HTTPWorm.exe")) {
-    await sleep(60000)
+    await ns.sleep(60000)
   }
 
   for (let serv of servers4Port) {
