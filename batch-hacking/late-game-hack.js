@@ -30,7 +30,7 @@ const prime = async (ns, target) => {
 	while (ns.getServerMinSecurityLevel(target) < ns.getServerSecurityLevel(target)) {
 		
 		let weaken_time = ns.getWeakenTime(target)
-		await ns.exec(weakenScript.filename, 
+		ns.exec(weakenScript.filename, 
 						host, 
 						Math.floor(getFreeRam(ns, host) / weakenScript.ram),
 						target, 0)
@@ -48,11 +48,11 @@ const prime = async (ns, target) => {
 		=> ram_usage = 23.575 * weaken_threads = 1.886 * growth_threads (round up to 1.9)
 		*/
 		let grow_threads = Math.floor(getFreeRam(ns, host) / 1.9)
-		await ns.exec(growScript.filename, host, grow_threads, target, 0)
+		ns.exec(growScript.filename, host, grow_threads, target, 0)
 
 		let weaken_time = ns.getWeakenTime(target)
 		let weaken_threads = Math.ceil(grow_threads * growSecurityEffect / weakenSecurityEffect)
-		await ns.exec(weakenScript.filename, host, weaken_threads, target, 0)
+		ns.exec(weakenScript.filename, host, weaken_threads, target, 0)
 
 		await ns.sleep(Math.max(grow_time, weaken_time) + 1000)
 	}
@@ -82,19 +82,20 @@ export async function main(ns) {
 		} else {
 			const max_time = Math.max(ns.getGrowTime(target), ns.getHackTime(target), ns.getWeakenTime(target))
 
-			await ns.exec(growScript.filename, host, grow_threads, 
-								target, max_time - ns.getGrowTime(target), iteration)
+			
+			await ns.exec(hackScript.filename, host, hack_threads, 
+								target, max_time - ns.getHackTime(target), iteration)
 
-			await ns.exec(weakenScript.filename, host, weaken_after_grow, 
+			await ns.exec(weakenScript.filename, host, weaken_after_hack, 
 								target, max_time - ns.getWeakenTime(target) + 200, iteration)
 
-			await ns.exec(hackScript.filename, host, hack_threads, 
-								target, max_time - ns.getHackTime(target) + 400, iteration)
+			await ns.exec(growScript.filename, host, grow_threads, 
+								target, max_time - ns.getGrowTime(target) + 400, iteration)
 
-			await ns.exec(weakenScript.filename, host, weaken_after_hack,
+			await ns.exec(weakenScript.filename, host, weaken_after_grow,
 								target, max_time - ns.getWeakenTime(target) + 600, iteration)
 
-			await ns.sleep(1000)
+			await ns.sleep(800)
 		}
 		iteration++
 	}

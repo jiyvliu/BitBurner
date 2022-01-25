@@ -28,6 +28,28 @@ export async function generate_scan(ns) {
 			}
 			return
 		}
+		
+		// returns [{"hostname": name, "level": hacking_level, "max_money": server_max_money}, ... ]
+		// sorted by server.max_money
+		highestHackableServers() {
+			let levels = []
+			if (this.children.length > 0) {
+				for (let child of this.children) {
+					levels = levels.concat(child.highestHackableServers())
+				}
+			}
+
+			// nitesec csec blackhand have no money
+			if (['CSEC', 'avmnite-o2h', 'I.I.I.I', 'The-Cave'].includes(this.name)) {
+				return levels.sort((a, b) => (b.max_money - a.max_money))
+			// within hacking level
+			} else if (ns.getHackingLevel() >= this.hacking_level && ns.hasRootAccess(this.name)) {
+				levels.push({ "hostname": this.name, "level": this.hacking_level, "max_money": ns.getServerMaxMoney(this.name) })
+				return levels.sort((a, b) => (b.max_money - a.max_money))
+			} else {
+				return levels.sort((a, b) => (b.max_money - a.max_money))
+			}
+		}
 
 		// returns [server_name, hacking_level]
 		findHighestHackableChild() {
@@ -35,23 +57,23 @@ export async function generate_scan(ns) {
 			// base cases
 			if (this.children.length == 0) {
 				// nitesec csec blackhand have no money
-				if (['CSEC', 'avmnite-o2h', 'I.I.I.I'].includes(this.name)) {
+				if (['CSEC', 'avmnite-o2h', 'I.I.I.I', 'The-Cave'].includes(this.name)) {
 					return [this.name, -1]
-				// within hacking level
+					// within hacking level
 				} else if (ns.getHackingLevel() >= this.hacking_level && ns.hasRootAccess(this.name)) {
 					return [this.name, this.hacking_level]
-				// too high hacking level
+					// too high hacking level
 				} else {
 					return [this.name, -1]
 				}
-			// recursive case
+				// recursive case
 			} else {
 				let hacking_levels = this.children.map(child => child.findHighestHackableChild())
 
 				// nitesec csec blackhand have no money
 				if (['CSEC', 'avmnite-o2h', 'I.I.I.I'].includes(this.name)) {
 					hacking_levels.push([this.name, -1])
-				// add current server hacking level to list
+					// add current server hacking level to list
 				} else if (ns.getHackingLevel() >= this.hacking_level && ns.hasRootAccess(this.name)) {
 					hacking_levels.push([this.name, this.hacking_level])
 				} else {
@@ -63,11 +85,11 @@ export async function generate_scan(ns) {
 				const highest_level = Math.max(...levels)
 				// filter out servers that doesn't have highest hacking level
 				const highest_child = hacking_levels.filter(child => child[1] === highest_level)[0]
-				
+
 				return highest_child
 			}
 		}
 	}
-	
+
 	return new Server("home", null)
 }

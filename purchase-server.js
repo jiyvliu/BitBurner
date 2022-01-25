@@ -8,11 +8,11 @@ export async function main(ns) {
 	ns.disableLog('getServerMoneyAvailable')
 	
 	let ram_target = ns.args[0]
-	const server_tree = await generate_scan(ns)
-	const script = "early-hack-template.script"
+	const script = "early-hack-template.script"	
+	const low_level_targets = ["foodnstuff", "sigma-cosmetics", "neo-net", "zer0", "max-hardware", "iron-gym", "phantasy"]
 
 	while(ram_target <= ns.getPurchasedServerMaxRam()) {
-		let target = server_tree.findHighestHackableChild()[0]
+		let target = low_level_targets[Math.floor(Math.random() * low_level_targets.length)]
 		
 		for (let i = 0; i < ns.getPurchasedServerLimit(); i++) {
 
